@@ -1,3 +1,105 @@
-<video autoplay style="width:50%;height:50%">
-  <source type="service/webos-external" src="ext://hdmi:1"></source>
-</video>
+<html>
+<head>
+<script type="text/javascript">
+/*
+  function setForceAliveTime(){
+    var bridge = new PalmServiceBridge();
+      var url = 'luna://com.webos.service.acr/setForceAliveTime';
+      bridge.url = url;
+    bridge.onservicecallback = callback;
+
+    function callback(msg){
+        var cbObject = JSON.parse(msg);
+      
+        console.log(cbObject.returnValue);
+    }
+
+    var params = '{"time" : 0}';
+    
+      bridge.call(url, params);
+  }
+*/
+  function setVideoPig(){
+    var bridge = new PalmServiceBridge();
+      var url = 'luna://com.webos.service.acr/setVideoPig';
+      bridge.url = url;
+    bridge.onservicecallback = callback;
+
+    function callback(msg){
+        var cbObject = JSON.parse(msg);
+      
+        console.log(cbObject.returnValue);
+    }
+
+    var params = '{"fullScreen" : true, "positionX" : 0,"positionY" : 0,"width" : 0,"height" : 0}';
+    
+      bridge.call(url, params);
+  }
+
+	var closedparams;
+	
+    function closedApplication(){
+		var bridge = new PalmServiceBridge();
+		var url = 'luna://com.webos.service.acr/closedApplication';
+		bridge.url = url;
+		bridge.onservicecallback = callback;
+
+		function callback(msg){
+			var cbObject = JSON.parse(msg);
+
+			console.log(cbObject.returnValue);
+		}
+
+
+		bridge.call(url, closedparams);
+  }
+
+
+  window.onload = function()
+  {
+	closedparams = '{"location": ' +'"'+window.location+'"'+  '}';
+	PalmSystem.setLoadErrorPolicy('event');
+	document.addEventListener("webOSLoadError", function(event) {
+		console.log("webOSLoadError:event"+event.detail.errorCode); 
+		closedparams = '{"location": ' +'"'+window.location+'"'+  ',"errorcode":"'+event.detail.errorCode+'"' + '}';
+		window.close();
+	}, true);
+
+	window.PalmSystem.setInputRegion ([ {"x": 0, "y": 0, "width":0, "height":0}]);
+	window.PalmSystem.setKeyMask (["KeyMaskNone"]);
+	console.log("onload setInputRegion KeyMaskNone by acrapp");
+	console.log("onload window.location:" + window.location);
+	document.getElementById('present_frm').src = "present_frm.html";
+	present_frm.focus();
+  }
+
+  function closeAcrApp()
+  {
+//	setForceAliveTime();
+	setVideoPig();
+	closedApplication();
+	console.log("onunload by acrapp"); 
+  }
+
+  if(window.PalmSystem){
+      if (window.PalmSystem.hasOwnProperty('onclose')) {//webOS 3.0 support
+          window.PalmSystem.onclose = function() {
+             //clean-up resource
+             closeAcrApp();
+          };
+      } else {//~webOS 2.0 support
+           window.onunload = function() {
+             //clean-up resource
+             closeAcrApp();
+           };
+      }
+  }
+
+</script>
+
+    <title>ACR App</title>
+	<iframe id="present_frm" name="present_frm" style="position:absolute; left:0px; top:0px; width:100%; height:100%; border:0; margin:0" scrolling="no" noresize="noresize"/>
+</head>
+<body>
+</body>
+</html>
